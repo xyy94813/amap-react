@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Meta, Story } from '@storybook/react';
 
 import { AMapMap, MapProps } from 'index';
@@ -8,9 +8,11 @@ import { AsyncPluginAPIContainer as APIContainer } from '../../AMapAPIContainer/
 AMapMap.displayName = 'AMapMap';
 
 const withAPIContainer = (renderStory: Story, context: any) => (
-  <APIContainer>
-    <div style={{ height: '400px' }}>{renderStory({}, context)}</div>
-  </APIContainer>
+  <Suspense fallback="loading...">
+    <APIContainer>
+      <div style={{ height: '400px' }}>{renderStory({}, context)}</div>
+    </APIContainer>
+  </Suspense>
 );
 
 export default {
@@ -67,9 +69,11 @@ SetZoom.args = {
 };
 
 export const withAMapContainer = (renderStory: Story, context: any) => (
-  <APIContainer>
-    <div style={{ height: '400px' }}>
-      <AMapMap>{renderStory({}, context)}</AMapMap>
-    </div>
-  </APIContainer>
+  <Suspense fallback="loading...">
+    <APIContainer>
+      <div style={{ height: '400px' }}>
+        <AMapMap>{renderStory({}, context)}</AMapMap>
+      </div>
+    </APIContainer>
+  </Suspense>
 );

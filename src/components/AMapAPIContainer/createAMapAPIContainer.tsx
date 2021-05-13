@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { lazy } from 'react';
 import AMapLoader from '@amap/amap-jsapi-loader';
 
 import AMapAPIContext from './AMapAPIContext';
@@ -23,42 +23,15 @@ export const createAMapAPIContainer = (options: createAMapAPIContainerOptions) =
     plugins,
   });
 
-  return class AMapAPIContainer extends PureComponent<AMapAPIHocProps> {
-    state = {
-      AMap: null,
+  return lazy(async () => {
+    const AMap = await loadAMapAPI();
+    const AMapAPIContainer = ({ children }: AMapAPIHocProps) => (
+      <AMapAPIContext.Provider value={{ __AMAP__: AMap }}>{children}</AMapAPIContext.Provider>
+    );
+    return {
+      default: AMapAPIContainer,
     };
-
-    componentDidMount() {
-      let retryTime = 0;
-      loadAMapAPI().then(
-        (AMap) => {
-          this.setState({
-            AMap,
-          });
-        },
-        (reason) => {
-          // eslint-disable-next-line no-console
-          console.error(reason);
-          if (retryTime > 3) {
-            throw Error(reason);
-          }
-
-          retryTime += 1;
-
-          return loadAMapAPI();
-        },
-      );
-    }
-
-    render() {
-      const { children } = this.props;
-      const { AMap } = this.state;
-
-      return (
-        <AMapAPIContext.Provider value={{ __AMAP__: AMap }}>{children}</AMapAPIContext.Provider>
-      );
-    }
-  };
+  });
 };
 
 export default createAMapAPIContainer;
